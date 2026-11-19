@@ -36,23 +36,23 @@
             },
             "mapper": {
                 "from": "drive",
-                "limit": 100,
+                "valueRenderOption": "UNFORMATTED_VALUE",
+                "dateTimeRenderOption": "FORMATTED_STRING",
+                "limit": "100",
+                "spreadsheetId": "REPLACE_WITH_YOUR_SPREADSHEET_ID",
+                "sheetId": "Unanswered_Leads",
+                "includesHeaders": true,
+                "tableFirstRow": "A1:Z1",
                 "filter": [
                     [
                         {
                             "a": "F",
-                            "b": "open",
-                            "o": "text:equal"
+                            "o": "text:equal",
+                            "b": "open"
                         }
                     ]
                 ],
-                "sheetId": "Unanswered_Leads",
-                "sortOrder": "asc",
-                "spreadsheetId": "REPLACE_WITH_YOUR_SPREADSHEET_ID",
-                "tableFirstRow": "A1:F1",
-                "includesHeaders": true,
-                "valueRenderOption": "UNFORMATTED_VALUE",
-                "dateTimeRenderOption": "FORMATTED_STRING"
+                "sortOrder": "asc"
             },
             "metadata": {
                 "designer": {
@@ -60,13 +60,327 @@
                     "y": 0,
                     "name": "Read open leads (maximum 100; see setup cap)"
                 },
+                "setupValidation": {
+                    "version": 1,
+                    "configuration": "b9cbab19bcfaf061",
+                    "result": {
+                        "valid": true,
+                        "fields": []
+                    }
+                },
                 "restore": {
-                    "mapper": {
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "label": "Google Sheets connection",
+                            "data": {
+                                "scoped": "true",
+                                "connection": "google"
+                            }
+                        }
+                    },
+                    "expect": {
+                        "from": {
+                            "label": "Select from My Drive"
+                        },
+                        "valueRenderOption": {
+                            "mode": "chose",
+                            "label": "Unformatted value"
+                        },
+                        "dateTimeRenderOption": {
+                            "mode": "chose",
+                            "label": "Formatted string"
+                        },
                         "spreadsheetId": {
+                            "mode": "chose",
                             "label": "Unanswered Leads - Demo (AIDO L5 bonus 2)"
+                        },
+                        "sheetId": {
+                            "mode": "chose",
+                            "label": "Unanswered_Leads"
+                        },
+                        "includesHeaders": {
+                            "mode": "chose",
+                            "label": "Yes"
+                        },
+                        "tableFirstRow": {
+                            "label": "A-Z"
+                        },
+                        "orderBy": {
+                            "mode": "chose",
+                            "label": "Empty"
+                        },
+                        "sortOrder": {
+                            "mode": "chose",
+                            "label": "Ascending"
                         }
                     }
-                }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:google",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "from",
+                        "type": "select",
+                        "label": "Search Method",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "drive",
+                                "share"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "valueRenderOption",
+                        "type": "select",
+                        "label": "Value render option",
+                        "validate": {
+                            "enum": [
+                                "FORMATTED_VALUE",
+                                "UNFORMATTED_VALUE",
+                                "FORMULA"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "dateTimeRenderOption",
+                        "type": "select",
+                        "label": "Date and time render option",
+                        "validate": {
+                            "enum": [
+                                "SERIAL_NUMBER",
+                                "FORMATTED_STRING"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "type": "uinteger",
+                        "label": "Limit"
+                    },
+                    {
+                        "name": "spreadsheetId",
+                        "type": "select",
+                        "label": "Spreadsheet Name",
+                        "required": true
+                    },
+                    {
+                        "name": "sheetId",
+                        "type": "select",
+                        "label": "Sheet Name",
+                        "required": true
+                    },
+                    {
+                        "name": "includesHeaders",
+                        "type": "select",
+                        "label": "Table contains headers",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                true,
+                                false
+                            ]
+                        }
+                    },
+                    {
+                        "name": "tableFirstRow",
+                        "type": "select",
+                        "label": "Column range",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "A1:Z1",
+                                "A1:BZ1",
+                                "A1:CZ1",
+                                "A1:DZ1",
+                                "A1:MZ1",
+                                "A1:ZZ1",
+                                "A1:AZZ1",
+                                "A1:BZZ1",
+                                "A1:CZZ1",
+                                "A1:DZZ1",
+                                "A1:MZZ1",
+                                "A1:ZZZ1"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "type": "filter",
+                        "label": "Filter",
+                        "options": "rpc://google-sheets/2/rpcGetFilterKeys?includesHeaders=true"
+                    },
+                    {
+                        "name": "orderBy",
+                        "type": "select",
+                        "label": "Order by"
+                    },
+                    {
+                        "name": "sortOrder",
+                        "type": "select",
+                        "label": "Sort order",
+                        "validate": {
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "__ROW_NUMBER__",
+                        "label": "Row number",
+                        "type": "number"
+                    },
+                    {
+                        "name": "__SPREADSHEET_ID__",
+                        "label": "Spreadsheet ID",
+                        "type": "text"
+                    },
+                    {
+                        "name": "__SHEET__",
+                        "label": "Sheet",
+                        "type": "text"
+                    },
+                    {
+                        "name": "0",
+                        "label": "lead_key (A)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "1",
+                        "label": "contact (B)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "2",
+                        "label": "name (C)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "3",
+                        "label": "received_at_utc (D)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "4",
+                        "label": "last_reply_at_utc (E)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "5",
+                        "label": "status (F)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "6",
+                        "label": "(G)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "7",
+                        "label": "(H)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "8",
+                        "label": "(I)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "9",
+                        "label": "(J)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "10",
+                        "label": "(K)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "11",
+                        "label": "(L)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "12",
+                        "label": "(M)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "13",
+                        "label": "(N)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "14",
+                        "label": "(O)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "15",
+                        "label": "(P)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "16",
+                        "label": "(Q)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "17",
+                        "label": "(R)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "18",
+                        "label": "(S)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "19",
+                        "label": "(T)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "20",
+                        "label": "(U)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "21",
+                        "label": "(V)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "22",
+                        "label": "(W)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "23",
+                        "label": "(X)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "24",
+                        "label": "(Y)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "25",
+                        "label": "(Z)",
+                        "type": "text"
+                    }
+                ],
+                "advanced": true
             }
         },
         {
@@ -166,16 +480,181 @@
                 "to": [
                     "{{1.owner_email}}"
                 ],
-                "content": "<p>These open leads have no reply marker and are at least {{escapeHTML(1.wait_days)}} complete days old.</p><ul>{{4.text}}</ul><p>Scan cap: 100 open rows. Update last_reply_at_utc or status in your sheet after reviewing a lead.</p>",
                 "subject": "Unanswered leads — {{formatDate(now; \"YYYY-MM-DD\"; \"UTC\")}}",
-                "bodyType": "rawHtml"
+                "bodyType": "rawHtml",
+                "content": "<p>These open leads have no reply marker and are at least {{escapeHTML(1.wait_days)}} complete days old.</p><ul>{{4.text}}</ul><p>Scan cap: 100 open rows. Update last_reply_at_utc or status in your sheet after reviewing a lead.</p>"
             },
             "metadata": {
                 "designer": {
                     "x": 1340,
                     "y": 0,
                     "name": "Send one digest to the owner only"
-                }
+                },
+                "setupValidation": {
+                    "version": 1,
+                    "configuration": "145b7f422fa889f9",
+                    "result": {
+                        "valid": true,
+                        "fields": []
+                    }
+                },
+                "restore": {
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "label": "Gmail connection",
+                            "data": {
+                                "scoped": "true",
+                                "connection": "google-email"
+                            }
+                        }
+                    },
+                    "expect": {
+                        "to": {
+                            "mode": "chose",
+                            "items": [
+                                null
+                            ]
+                        },
+                        "bodyType": {
+                            "label": "Raw HTML"
+                        },
+                        "attachments": {
+                            "mode": "chose"
+                        },
+                        "from": {
+                            "mode": "chose",
+                            "label": "Empty"
+                        },
+                        "cc": {
+                            "mode": "chose"
+                        },
+                        "bcc": {
+                            "mode": "chose"
+                        },
+                        "emailHeaders": {
+                            "mode": "chose"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:google-email",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "to",
+                        "type": "array",
+                        "label": "To",
+                        "required": true,
+                        "spec": {
+                            "type": "email",
+                            "label": "Recipient email address",
+                            "required": true,
+                            "validate": true,
+                            "name": "value"
+                        }
+                    },
+                    {
+                        "name": "subject",
+                        "type": "text",
+                        "label": "Subject"
+                    },
+                    {
+                        "name": "bodyType",
+                        "type": "select",
+                        "label": "Body type",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "rawHtml",
+                                "collection"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "attachments",
+                        "type": "array",
+                        "label": "Attachments",
+                        "spec": {
+                            "spec": [
+                                {
+                                    "name": "filename",
+                                    "type": "filename",
+                                    "label": "File name",
+                                    "required": true,
+                                    "semantic": "file:name"
+                                },
+                                {
+                                    "name": "data",
+                                    "type": "buffer",
+                                    "label": "Data",
+                                    "required": true,
+                                    "semantic": "file:data"
+                                }
+                            ],
+                            "type": "collection",
+                            "label": "Attachment",
+                            "name": "value"
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "type": "select",
+                        "label": "From"
+                    },
+                    {
+                        "name": "cc",
+                        "type": "array",
+                        "label": "CC recipients",
+                        "spec": {
+                            "type": "email",
+                            "label": "Recipient email address",
+                            "name": "value"
+                        }
+                    },
+                    {
+                        "name": "bcc",
+                        "type": "array",
+                        "label": "BCC recipients",
+                        "spec": {
+                            "type": "email",
+                            "label": "Recipient email address",
+                            "name": "value"
+                        }
+                    },
+                    {
+                        "name": "emailHeaders",
+                        "type": "array",
+                        "label": "Additional email headers",
+                        "spec": {
+                            "spec": [
+                                {
+                                    "name": "key",
+                                    "type": "text",
+                                    "label": "Key",
+                                    "required": true
+                                },
+                                {
+                                    "name": "value",
+                                    "type": "text",
+                                    "label": "Value"
+                                }
+                            ],
+                            "type": "collection",
+                            "label": "Email header",
+                            "name": "value"
+                        }
+                    },
+                    {
+                        "name": "content",
+                        "type": "text",
+                        "label": "Content"
+                    }
+                ]
             }
         }
     ],
