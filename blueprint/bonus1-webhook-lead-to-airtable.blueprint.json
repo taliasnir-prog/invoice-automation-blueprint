@@ -1,0 +1,322 @@
+{
+    "name": "AIDO L5 Bonus 1 - Webhook Lead → Airtable (Leads Dashboard)",
+    "flow": [
+        {
+            "id": 1,
+            "module": "gateway:CustomWebHook",
+            "version": 1,
+            "parameters": {
+                "hook": 4138107
+            },
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 300,
+                    "name": "New lead webhook"
+                }
+            }
+        },
+        {
+            "id": 2,
+            "module": "util:SetVariables",
+            "version": 1,
+            "parameters": {},
+            "mapper": {
+                "scope": "roundtrip",
+                "variables": [
+                    {
+                        "name": "name_clean",
+                        "value": "{{trim(1.name)}}"
+                    },
+                    {
+                        "name": "email_clean",
+                        "value": "{{lower(trim(1.email))}}"
+                    },
+                    {
+                        "name": "phone_clean",
+                        "value": "{{replace(replace(replace(replace(trim(1.phone); \"-\"; emptystring); \" \"; emptystring); \"(\"; emptystring); \")\"; emptystring)}}"
+                    },
+                    {
+                        "name": "source_clean",
+                        "value": "{{switch(1.source; \"Facebook\"; \"Facebook\"; \"Google\"; \"Google\"; \"אתר\"; \"אתר\"; \"הפניה\"; \"הפניה\"; \"אתר\")}}"
+                    },
+                    {
+                        "name": "interest_clean",
+                        "value": "{{switch(1.interest; \"גבוהה\"; \"גבוהה\"; \"בינונית\"; \"בינונית\"; \"נמוכה\"; \"נמוכה\"; emptystring)}}"
+                    }
+                ]
+            },
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 300,
+                    "name": "Clean incoming fields"
+                }
+            }
+        },
+        {
+            "id": 12,
+            "module": "builtin:BasicIfElse",
+            "version": 1,
+            "mapper": null,
+            "metadata": {
+                "designer": {
+                    "x": 600,
+                    "y": 300,
+                    "name": "Valid lead?"
+                }
+            },
+            "branches": [
+                {
+                    "merge": false,
+                    "label": "Valid lead",
+                    "type": "condition",
+                    "flow": [
+                        {
+                            "id": 13,
+                            "module": "airtable:ActionSearchRecords",
+                            "version": 3,
+                            "parameters": {
+                                "__IMTCONN__": 13202200
+                            },
+                            "mapper": {
+                                "base": "REPLACE_WITH_YOUR_AIRTABLE_BASE_ID",
+                                "table": "tblOCKeEGAkDVmur9",
+                                "formula": "LOWER(TRIM({email})) = '{{2.email_clean}}'",
+                                "maxRecords": 1,
+                                "useColumnId": false,
+                                "formulaField": "formula"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 900,
+                                    "y": 150,
+                                    "name": "Dedup - lead already in Airtable?"
+                                },
+                                "restore": {
+                                    "mapper": {
+                                        "base": {
+                                            "label": "AIDO - Leads Database"
+                                        },
+                                        "table": {
+                                            "label": "Leads"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "id": 15,
+                            "module": "builtin:BasicAggregator",
+                            "version": 1,
+                            "parameters": {
+                                "feeder": 13
+                            },
+                            "mapper": {
+                                "recordId": "{{13.id}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 1220,
+                                    "y": 150,
+                                    "name": "Dedup - collect matches"
+                                }
+                            }
+                        },
+                        {
+                            "id": 16,
+                            "module": "builtin:BasicIfElse",
+                            "version": 1,
+                            "mapper": null,
+                            "metadata": {
+                                "designer": {
+                                    "x": 1520,
+                                    "y": 150,
+                                    "name": "Duplicate or new"
+                                }
+                            },
+                            "branches": [
+                                {
+                                    "merge": false,
+                                    "label": "Lead already exists",
+                                    "type": "condition",
+                                    "flow": [
+                                        {
+                                            "id": 17,
+                                            "module": "gateway:WebhookRespond",
+                                            "version": 1,
+                                            "mapper": {
+                                                "body": "{\"status\":\"duplicate\"}",
+                                                "status": 200,
+                                                "headers": [
+                                                    {
+                                                        "key": "Content-Type",
+                                                        "value": "application/json"
+                                                    }
+                                                ]
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1820,
+                                                    "y": 0,
+                                                    "name": "Already exists (200)"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "conditions": [
+                                        [
+                                            {
+                                                "a": "{{first(map(15.array; \"recordId\"))}}",
+                                                "o": "exist"
+                                            }
+                                        ]
+                                    ]
+                                },
+                                {
+                                    "merge": false,
+                                    "disabled": false,
+                                    "label": "",
+                                    "type": "else",
+                                    "flow": [
+                                        {
+                                            "id": 18,
+                                            "module": "airtable:ActionCreateRecord",
+                                            "version": 3,
+                                            "parameters": {
+                                                "__IMTCONN__": 13202200
+                                            },
+                                            "mapper": {
+                                                "base": "REPLACE_WITH_YOUR_AIRTABLE_BASE_ID",
+                                                "table": "tblOCKeEGAkDVmur9",
+                                                "record": {
+                                                    "fldElLW0OPJ6GMh4M": "{{2.email_clean}}",
+                                                    "fldEpxQu76fLSk0H5": "{{2.source_clean}}",
+                                                    "fldGrhgqLQ2gs5PJS": "{{2.interest_clean}}",
+                                                    "fldKLZsCkP2CyIpRL": "{{formatDate(now; \"YYYY-MM-DD\")}}",
+                                                    "fldcPqxXtBPvcZJDg": "{{2.name_clean}}",
+                                                    "fldfhnPYjobhclQCX": "נתוני דמה",
+                                                    "fldmNHSyKx2NmcXxj": "{{2.phone_clean}}",
+                                                    "fldxfia0lOCHNJM2z": "חדש"
+                                                },
+                                                "typecast": false,
+                                                "useColumnId": false
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1820,
+                                                    "y": 300,
+                                                    "name": "Create lead in dashboard base"
+                                                },
+                                                "restore": {
+                                                    "mapper": {
+                                                        "base": {
+                                                            "label": "AIDO - Leads Database"
+                                                        },
+                                                        "table": {
+                                                            "label": "Leads"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "id": 19,
+                                            "module": "gateway:WebhookRespond",
+                                            "version": 1,
+                                            "mapper": {
+                                                "body": "{\"status\":\"created\"}",
+                                                "status": 201,
+                                                "headers": [
+                                                    {
+                                                        "key": "Content-Type",
+                                                        "value": "application/json"
+                                                    }
+                                                ]
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 2120,
+                                                    "y": 300,
+                                                    "name": "Created (201)"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "conditions": [
+                        [
+                            {
+                                "a": "{{1.secret}}",
+                                "b": "REPLACE_WITH_YOUR_SHARED_SECRET",
+                                "o": "text:equal"
+                            },
+                            {
+                                "a": "{{2.name_clean}}",
+                                "b": "",
+                                "o": "text:notequal"
+                            },
+                            {
+                                "a": "{{2.email_clean}}",
+                                "b": "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$",
+                                "o": "text:pattern"
+                            }
+                        ]
+                    ]
+                },
+                {
+                    "merge": false,
+                    "disabled": false,
+                    "label": "",
+                    "type": "else",
+                    "flow": [
+                        {
+                            "id": 14,
+                            "module": "gateway:WebhookRespond",
+                            "version": 1,
+                            "mapper": {
+                                "body": "{\"status\":\"rejected\"}",
+                                "status": 400,
+                                "headers": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ]
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 900,
+                                    "y": 600,
+                                    "name": "Reject (400)"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "instant": true,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "eu1.make.com",
+        "notes": []
+    }
+}
