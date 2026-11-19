@@ -42,7 +42,7 @@
                     },
                     {
                         "name": "interest_clean",
-                        "value": "{{switch(1.interest; \"גבוהה\"; \"גבוהה\"; \"בינונית\"; \"בינונית\"; \"נמוכה\"; \"נמוכה\"; emptystring)}}"
+                        "value": "{{switch(1.interest; \"גבוהה\"; \"גבוהה\"; \"בינונית\"; \"בינונית\"; \"נמוכה\"; \"נמוכה\"; \"בינונית\")}}"
                     }
                 ]
             },
@@ -194,6 +194,7 @@
                                                     "fldEpxQu76fLSk0H5": "{{2.source_clean}}",
                                                     "fldGrhgqLQ2gs5PJS": "{{2.interest_clean}}",
                                                     "fldKLZsCkP2CyIpRL": "{{formatDate(now; \"YYYY-MM-DD\")}}",
+                                                    "fldUXlc6Avaf8ysrR": "נועה ברק",
                                                     "fldcPqxXtBPvcZJDg": "{{2.name_clean}}",
                                                     "fldfhnPYjobhclQCX": "נתוני דמה",
                                                     "fldmNHSyKx2NmcXxj": "{{2.phone_clean}}",
@@ -255,13 +256,50 @@
                                 "o": "text:equal"
                             },
                             {
-                                "a": "{{2.name_clean}}",
-                                "b": "",
-                                "o": "text:notequal"
+                                "a": "{{length(2.name_clean)}}",
+                                "b": "2",
+                                "o": "number:greaterorequal"
+                            },
+                            {
+                                "a": "{{length(2.name_clean)}}",
+                                "b": "50",
+                                "o": "number:lessorequal"
                             },
                             {
                                 "a": "{{2.email_clean}}",
                                 "b": "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$",
+                                "o": "text:pattern"
+                            },
+                            {
+                                "a": "{{2.phone_clean}}",
+                                "b": "",
+                                "o": "text:equal"
+                            }
+                        ],
+                        [
+                            {
+                                "a": "{{1.secret}}",
+                                "b": "REPLACE_WITH_YOUR_SHARED_SECRET",
+                                "o": "text:equal"
+                            },
+                            {
+                                "a": "{{length(2.name_clean)}}",
+                                "b": "2",
+                                "o": "number:greaterorequal"
+                            },
+                            {
+                                "a": "{{length(2.name_clean)}}",
+                                "b": "50",
+                                "o": "number:lessorequal"
+                            },
+                            {
+                                "a": "{{2.email_clean}}",
+                                "b": "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$",
+                                "o": "text:pattern"
+                            },
+                            {
+                                "a": "{{2.phone_clean}}",
+                                "b": "^[0-9]{9,10}$",
                                 "o": "text:pattern"
                             }
                         ]
