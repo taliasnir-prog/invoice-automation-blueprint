@@ -345,7 +345,7 @@
             "roundtrips": 1,
             "maxErrors": 3,
             "autoCommit": true,
-            "sequential": false,
+            "sequential": true,
             "slots": null,
             "confidential": false,
             "dataloss": false,
